@@ -1,0 +1,207 @@
+{{#if state.errorMessage}}
+  <div class="alert alert-danger error-message mt-2">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="error-message-title">
+        {{#if state.errorTitle}}
+          {{errorTitle}}
+        {{else}}
+          Unexpected Error Occurred
+        {{/if}}
+      </div>
+      <div>
+        {{fa-icon icon="times" fixedWidth=true click=(pipe-action (set state "errorMessage" "")(set state "errorTitle" "")) class="close-icon"}}
+      </div>
+    </div>
+    <div class="error-scrolling-container">
+      <pre>{{state.errorMessage}}</pre>
+    </div>
+  </div>
+{{/if}}
+
+{{!-- Begin Credential Update --}}
+{{#if (and details.credentialsExpired (not details.configurationMode))}}
+  <div>
+    Your API Key is about to expire.  Please go to <a href="https://polarity.io">the API key portal</a> to generate a new API 
+    key.  Add your new API key here and click "Save" to update all your integrations.
+  </div>
+  <div class="input-container mb-0">
+    <label class="small ifta-label">
+      API Key
+      <span class="required">*</span>
+    </label>
+    {{input
+        class=(concat "ifta-field" (if state.apiKeyError " error"))
+        value=state.newApiKey
+        placeholder=""
+        disabled=state.isUpdating
+        required=true
+    }}
+  </div>
+  {{#if state.apiKeyError}}
+    <div class="ifta-error-message">
+      {{state.apiKeyError}}
+    </div>
+  {{/if}}
+  <div class="section-container mt-2">
+    <div class="p-title header-container mt-0 padded">Integrations to Update</div>
+    {{#each state.managedOptions as | option |}}
+        <div class="integration-row d-flex align-items-center justify-content-between">
+          <div>
+            <div>
+              {{option.integrationName}} - {{option.name}}
+            </div>
+            {{#if option.errorMessage}}
+              <div class="ifta-error-message">
+                {{option.errorMessage}}
+              </div>
+            {{/if}}
+          </div>
+          <div>
+            {{#if option.isUpdating}}
+              {{fa-icon icon="spinner-third" spin=true fixedWidth=true}}
+            {{else if option.errorMessage}}
+              {{fa-icon icon="exclamation-circle" fixedWidth=true class="text-danger"}}
+            {{else if option.isUpdated}}
+              {{fa-icon icon="check-circle" fixedWidth=true class="text-success"}}
+            {{/if}}
+          </div>
+        </div>
+    {{/each}}
+  </div>
+  {{#if state.allSuccess}}
+    <div class="alert alert-success mt-2 p-2">
+      {{fa-icon icon="badge-check" fixedWidth=true}} All integrations have been successfully updated with the new API key.
+    </div>
+  {{/if}}
+  <div class="mt-2">
+    <button
+      class="btn btn-polarity"
+      {{action "saveApiKey"}}
+      disabled={{if state.isUpdating true}}
+    >
+      {{#if state.isUpdating}}
+        {{fa-icon icon="spinner-third" spin=true fixedWidth=true}}
+      {{else}}
+        Save
+      {{/if}}
+    </button>
+  </div>
+{{/if}}
+{{!-- End Credential Update --}}
+
+
+
+
+{{!-- Begin Configuration Mode UI --}}
+{{#if details.configurationMode}}
+  <h1 class="p-title mt-0">Admin Credential Configuration</h1>
+  <div class="section-container padded">
+    <h1 class="p-title mt-0">Managed Integration Options</h1>
+    <div class="p-footnote">
+      The listed integration options are managed by the credential manager and will be updated when a user
+      updates their API key.
+    </div>
+    <div class="section-container mt-1">
+      {{#if hasManagedOptions}}
+        {{#each state.managedOptions as | option managedOptionIndex|}}
+          {{#unless option.pendingDeletion}}
+            <div class="integration-row d-flex align-items-center justify-content-between">
+              <div>
+                {{option.integrationName}} - {{option.name}}
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                {{#unless option.isSaved}}
+                  <div>
+                    {{fa-icon icon="save" fixedWidth=true}}
+                    {{bs-tooltip title="Option is not saved yet"}}
+                  </div>
+                {{/unless}}
+                <div class="selectable" {{action "removeManagedOption" managedOptionIndex}}>
+                  {{fa-icon icon="times-circle" fixedWidth=true class="text-danger"}}
+                  {{bs-tooltip title="Remove option from being managed"}}
+                </div>
+              </div>
+            </div>
+          {{/unless}}
+        {{/each}}
+      {{else}}
+        <div class="padded">
+          No options are being managed by the credential manager.
+        </div>
+      {{/if}}
+    </div>
+    <div class="section-container">
+      <div class="header-container">
+        <div class="padded">
+          <h1 class="p-title mt-0">Select Integration Options to Manage</h1>
+          <div>
+            <label class="selectable d-flex align-items-center">
+              {{input type="checkbox" checked=state.passwordOnly disabled=state.isUpdating}}
+              <span class="ml-1">Only display password options</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="scrollable">
+        {{#each state.integrations as | integration integrationIndex|}}
+          {{#if (eq integration.status "running")}}
+            {{#if (or (and state.passwordOnly integration.hasPasswordOption)(not state.passwordOnly))}}
+              <div class="integration-row">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="p-value">{{integration.name}}</div>
+                <div>
+                  {{#if integration.expanded}}
+                    <div class="selectable" {{action (set integration "expanded" false)}}>
+                      {{fa-icon icon="chevron-up" fixedWidth=true}}
+                    </div>
+                  {{else}}
+                    <div class="selectable" {{action (set integration "expanded" true)}}>
+                      {{fa-icon icon="chevron-down" fixedWidth=true}}
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
+              {{#if integration.expanded}}
+                {{#each integration.integrationOptions as | option optionIndex|}}
+                  {{#if (or (and state.passwordOnly (eq option.type "password"))(not state.passwordOnly))}}
+                    <div>
+                      <label class="selectable" {{on "click" (action "toggleOption" option integrationIndex optionIndex)}}>                        
+                        {{#if option.selected}}
+                          {{fa-icon icon="times-circle" fixedWidth=true class="text-danger"}}
+                        {{else}}
+                          {{fa-icon icon="plus-circle" fixedWidth=true class="text-success"}}
+                        {{/if}}
+                        <span class="align-top">{{option.name}}</span>
+                        {{#if option.selected}}
+                          <span class="p-footnote">(managed))</span>
+                        {{/if}}
+                      </label>
+                    </div>
+                  {{/if}}
+                {{/each}}
+              {{/if}}
+            </div>
+            {{/if}}
+          {{/if}}  
+      {{/each}}
+      </div>
+    </div>
+    <div class="mt-2">
+      <button
+              class="btn btn-wide btn-polarity"
+        {{action "saveConfiguration"}}
+              disabled={{if (or state.isUpdating (not hasUnsavedOptions)) true}}
+      >
+        {{#if state.isUpdating}}
+          {{fa-icon icon="spinner-third" spin=true fixedWidth=true}}
+        {{else}}
+          Save Configuration
+        {{/if}}
+      </button>
+      <button class="btn btn-cancel" {{action "cancelConfigurationChanges"}} disabled={{if (or state.isUpdating (not hasUnsavedOptions)) true}}>
+        Cancel
+      </button>
+    </div>
+  </div>
+{{/if}}
+{{!-- End Configuration Mode --}}

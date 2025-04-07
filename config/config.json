@@ -1,0 +1,65 @@
+{
+  "name": "Polarity Credential Manager",
+  "acronym": "PCM",
+  "description": "Update integration credentials via the Overlay Window",
+  "dataTypes": [
+    "IPv4",
+    "domain"
+  ],
+  "entityTypes": [
+    "IPv4",
+    "domain"
+  ],
+  "onDemandOnly": true,
+  "defaultColor": "light-gray",
+  "styles": [
+    "./styles/styles.less"
+  ],
+  "block": {
+    "component": {
+      "file": "./components/block.js"
+    },
+    "template": {
+      "file": "./templates/block.hbs"
+    }
+  },
+  "request": {
+    "cert": "",
+    "key": "",
+    "passphrase": "",
+    "ca": "",
+    "proxy": ""
+  },
+  "logging": {
+    "level": "trace"
+  },
+  "options": [
+    {
+      "key": "apiKey",
+      "name": "User API Key",
+      "description": "This is the API key used by all of your integrations. This option should not be directly updated.  You will be asked to update the API key as needed via the Overlay Window.",
+      "default": "",
+      "type": "password",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "configurationMode",
+      "name": "Configuration Mode",
+      "description": "If checked, the integration will allow an admin to configure the \"Configuration\" option via the Overlay Window",
+      "default": false,
+      "type": "boolean",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "configuration",
+      "name": "Configuration",
+      "description": "JSON Configuration for the Polarity Credential Manager integration.  Should not generally be updated manually.",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": true
+    }
+  ]
+}
