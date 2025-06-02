@@ -1,4 +1,5 @@
 {
+  "polarityIntegrationUuid": "8731dcb0-3f79-11f0-89b6-ef9da6ab372e",
   "name": "Polarity Credential Manager",
   "acronym": "PCM",
   "description": "Update integration credentials via the Overlay Window",
