@@ -23,7 +23,7 @@ module.exports = {
     proxy: ''
   },
   logging: {
-    level: 'trace'
+    level: 'info'
   },
   options: [
     {
