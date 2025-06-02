@@ -1,0 +1,222 @@
+@red: #FF4559;
+@green: #7bc942;
+@dark-green: #63a830;
+
+.btn {
+  height: 25px;
+  font-weight: 500;
+  font-size: 12px;
+  width: 70px;
+
+  &.btn-wide {
+    width: 150px;
+  }
+}
+
+label {
+  margin: 0px;
+}
+
+.selectable {
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.integration-row {
+  border-bottom: 1px dotted #e4e9f2;
+  padding: 5px;
+
+  &:last-child {
+    border: none;
+  }
+}
+
+.header-container {
+  border-bottom: 1px solid #e4e9f2;
+}
+
+.section-container {
+  border: 1px solid #e4e9f2;
+  border-radius: 4px;
+  margin-bottom: 10px;
+
+  &.padded {
+    padding: 5px;
+  }
+}
+
+.padded {
+  padding: 5px;
+}
+
+.scrollable {
+  overflow-y: scroll;
+  max-height: 300px;
+  resize: vertical;
+  word-wrap: break-word;
+
+  &[style*="height"] {
+    max-height: unset;
+  }
+}
+
+
+/* Beginning of Form Styles */
+.input-container {
+  width: 100%;
+  position: relative;
+  margin-bottom: 12px;
+  margin-top: 5px;
+
+  &.text-area-container {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    z-index: 1;
+
+    &:focus-within {
+      -webkit-appearance: none;
+      outline: none;
+      color: #000000;
+      border-color: @green;
+      box-shadow: 0 0 0 0.2rem rgba(123, 201, 66, 0.25);
+    }
+
+    &.error {
+      border-color: @red;
+
+      &:focus-within {
+        border-color: @green !important;
+      }
+    }
+
+    textarea {
+      margin: 0px 10px 10px 10px;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      padding: 0px;
+      width: calc(100% - 20px);
+
+      &.ifta-field:focus {
+        -webkit-appearance: none;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    label {
+      padding: 3px 10px 5px;
+      margin: 0px;
+    }
+  }
+
+  label {
+    display: block;
+
+    .required {
+      color: @red;
+    }
+  }
+
+  textarea::placeholder, input::placeholder {
+    color: #dfdfdf;
+  }
+
+  textarea:focus::placeholder, input:focus::placeholder {
+    color: transparent;
+  }
+
+  input {
+    cursor: text;
+  }
+
+  .ifta-label {
+    margin-bottom: -15px;
+    z-index: 1;
+    position: relative;
+    padding: 0px 10px 0 10px;
+    pointer-events: none;
+  }
+
+  .ifta-field {
+    border: 0;
+    border-radius: 6px;
+    padding: 15px 10px 5px;
+    margin: 0px;
+    width: 100%;
+    border: 1px solid #ccc;
+    line-height: 12px;
+    height: 38px;
+
+    &.error {
+      border-color: @red;
+    }
+  }
+
+  .ifta-field:focus {
+    -webkit-appearance: none;
+    outline: none;
+    color: #000000;
+    border-color: @green;
+    box-shadow: 0 0 0 0.2rem rgba(123, 201, 66, 0.25);
+  }
+
+  select.ifta-field {
+    -webkit-appearance: none;
+    outline: none;
+    line-height: 16px;
+  }
+
+  &:focus-within label {
+    color: @dark-green !important;
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
+
+  input:disabled, select:disabled, textarea:disabled, &.text-area-container.disabled {
+    background-color: #f6f6f3 !important;
+  }
+}
+
+/* End of Form Styles */
+
+.ifta-error-message {
+  padding: 0;
+  color: red;
+  //margin-top: -13px;
+  font-size: 10px;
+  margin-left: 5px;
+}
+
+.error-message {
+  padding: 10px;
+
+  .error-message-title {
+    font-weight: 500;
+  }
+
+  .close-icon {
+    cursor: pointer;
+  }
+
+  .error-scrolling-container {
+    overflow-y: scroll;
+    overflow-x: auto;
+    max-height: 200px;
+
+    pre {
+      margin: 0px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  }
+}

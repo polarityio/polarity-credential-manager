@@ -1,0 +1,11 @@
+{
+  "main": "./integration.js",
+  "name": "polarity_credential_manager",
+  "version": "3.0.8",
+  "private": true,
+  "author": "ThreatConnect",
+  "dependencies": {
+    "postman-request": "^2.88.1-postman.42",
+    "async": "^3.2.6"
+  }
+}
