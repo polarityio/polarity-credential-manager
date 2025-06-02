@@ -1,13 +1,21 @@
 # Polarity Credential Manager
 
-Manage password option fields via the Overlay Window.
+This is a proof-of-concept integration for managing a shared API key across multiple integrations.  The integration works by having a single API key option.  When searches are triggered, the integration will check if the API key is expiring (via the `isCredentialExpiring` method defined in `src/is-credential-expiring.js`).  If the API key is expiring, the integration will display a result to the user that lets the user input a new API key value.  The integration will then update all managed integration options with the new API key value.
+
+| ![image](./images/configure.png)   | ![image](./images/update.png)        |
+|------------------------------------|--------------------------------------|
+| *Configure integrations to manage* | *Update options from Overlay Window* |
 
 ## Polarity Credential Manager Integration Options
 
+## Configuration Mode
+If checked, the integration will allow an admin to configure the "Configuration" option via the Overlay Window
 
+## User API Key
+This is the API key used by all of your integrations. This option should not be directly updated. You will be asked to update the API key as needed via the Overlay Window.
 
-### Only View IPs with Blocked Packets
-If enabled, the integration will only return information on IP addresses that have a blocked packet count greater than zero.
+## Configuration
+JSON Configuration for the Polarity Credential Manager integration. Should not generally be updated manually.
 
 ## Installation Instructions
 

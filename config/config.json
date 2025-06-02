@@ -35,15 +35,6 @@
   },
   "options": [
     {
-      "key": "apiKey",
-      "name": "User API Key",
-      "description": "This is the API key used by all of your integrations. This option should not be directly updated.  You will be asked to update the API key as needed via the Overlay Window.",
-      "default": "",
-      "type": "password",
-      "userCanEdit": true,
-      "adminOnly": false
-    },
-    {
       "key": "configurationMode",
       "name": "Configuration Mode",
       "description": "If checked, the integration will allow an admin to configure the \"Configuration\" option via the Overlay Window",
@@ -51,6 +42,15 @@
       "type": "boolean",
       "userCanEdit": false,
       "adminOnly": true
+    },
+    {
+      "key": "apiKey",
+      "name": "User API Key",
+      "description": "This is the API key used by all of your integrations. This option should not be directly updated.  You will be asked to update the API key as needed via the Overlay Window.",
+      "default": "",
+      "type": "password",
+      "userCanEdit": true,
+      "adminOnly": false
     },
     {
       "key": "configuration",

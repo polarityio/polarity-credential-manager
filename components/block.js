@@ -11,13 +11,7 @@ polarity.export = PolarityComponent.extend({
     'state.managedOptions.length',
     'state.managedOptions.@each.pendingDeletion',
     function () {
-      let num = 0;
-      this.get('state.managedOptions').forEach((option) => {
-        if (!option.pendingDeletion) {
-          num++;
-        }
-      });
-      return num > 0;
+      return this.get('state.managedOptions').some((option) => !option.pendingDeletion);
     }
   ),
   hasUnsavedOptions: Ember.computed(
@@ -65,6 +59,12 @@ polarity.export = PolarityComponent.extend({
         this.removeManagedOption(optionIndex);
       });
     },
+    /**
+     * Used to add/remove options to the Managed Options list
+     * @param option
+     * @param integrationIndex
+     * @param optionIndex
+     */
     toggleOption(option, integrationIndex, optionIndex) {
       this.toggleProperty(
         `state.integrations.${integrationIndex}.integrationOptions.${optionIndex}.selected`
@@ -95,6 +95,12 @@ polarity.export = PolarityComponent.extend({
         this.get('state.managedOptions').removeObject(optionToRemove);
       }
     },
+    /**
+     * Takes the new API key value provided by the user and updates all the managed integration options
+     * with the new API value.  Finally, it updates the API key value of the Polarity Credential Manager so
+     * the integration can monitor if the API key is about to expire.
+     * @returns {Promise<void>}
+     */
     async saveApiKey() {
       let newApiKey = this.get('state.newApiKey').trim();
       if (!newApiKey) {
@@ -176,14 +182,17 @@ polarity.export = PolarityComponent.extend({
       }
     }
   },
-  async getOptions() {
-    let options = this.store.peekAll('integration-option');
-    this.set('state.options', options);
-  },
+  /**
+   * Iterates over all loaded integrations creates a copy of the integration and saves
+   * it into the `state.integrations` variable.  This allows us to manipulate the integration
+   * objects without modifying integrations in the store directly.
+   *
+   * @returns {Promise<void>}
+   */
   async loadIntegrations() {
     let self = this;
     let storeIntegrations = this.store.peekAll('integration');
-    //
+
     storeIntegrations.forEach((integration) => {
       let integrationCopy = {
         id: integration.id,
@@ -209,13 +218,17 @@ polarity.export = PolarityComponent.extend({
             integrationId: integration.id
           });
         });
-        //
-        //self.get('state.integrations').pushObject(integrationCopy);
+
         let integrations = self.get('state.integrations');
         integrations.pushObject(integrationCopy);
       }
     });
   },
+  /**
+   * Saves the configuration for the Polarity Credential Manager integration as a JSON string.
+   *
+   * @returns {Promise<void>}
+   */
   async saveConfiguration() {
     const integrationId = this.get('block.integrationId');
     const optionId = `${integrationId}-configuration`;
@@ -237,9 +250,20 @@ polarity.export = PolarityComponent.extend({
     const response = await this.updateOption(optionId, optionValue, false, true);
     if (response.ok) {
       this.flashMessage('Configuration saved successfully', 'success');
-      this.reloadConfiguration();
+      await this.reloadConfiguration();
     }
   },
+  /**
+   * Updates the provided option to a new value by using the Polarity REST API.  Once the
+   * option is successfully updated server-side, this method also updates the internal data store
+   * used by the Polarity web application.
+   *
+   * @param optionId {string}, integration option id to update
+   * @param newOptionValue {string}, new value for the option
+   * @param userCanEdit {boolean}, true if the user can edit the option
+   * @param adminOnly {boolean}, true if only the admin can edit the option
+   * @returns {Promise<Response>}
+   */
   async updateOption(optionId, newOptionValue, userCanEdit, adminOnly) {
     this.set('state.isUpdating', true);
     const payload = {
@@ -288,11 +312,19 @@ polarity.export = PolarityComponent.extend({
       this.flashMessage(flashMessage, 'danger');
       response.__errorMessage = flashMessage;
     } else {
+      // Push our updated option in the Ember store so the updated value is accessible to the rest of the
+      // application
       this.store.pushPayload(payload);
     }
 
     return response;
   },
+  /**
+   * Loads the list of managed options that the Polarity Credential Manager has been configured
+   * to manage.
+   *
+   * @returns {Promise<void>}
+   */
   async reloadConfiguration() {
     let configuration;
     const integrationId = this.get('block.integrationId');
@@ -301,7 +333,11 @@ polarity.export = PolarityComponent.extend({
       `${integrationId}-configuration`
     );
 
-    if (configurationOption) {
+    if (
+      configurationOption &&
+      typeof configurationOption.value === 'string' &&
+      configurationOption.value.length > 0
+    ) {
       try {
         configuration = JSON.parse(configurationOption.get('value'));
       } catch (parseError) {
@@ -311,7 +347,6 @@ polarity.export = PolarityComponent.extend({
         );
       }
     }
-    console.info('Configuration', configuration);
 
     if (configuration) {
       this.get('state.managedOptions').clear();
